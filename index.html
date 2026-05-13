@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BOLETA — CBTIS 166</title>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #030308;
+    --bg2:       #080815;
+    --bg3:       #0d0d1f;
+    --neon-cyan: #00f5ff;
+    --neon-pink: #ff2d78;
+    --neon-green:#00ff88;
+    --neon-yellow:#ffe000;
+    --neon-purple:#bf00ff;
+    --text:      #c8d8e8;
+    --text-dim:  #4a5a7a;
+    --border:    #1a2a4a;
+    --glow-c: 0 0 8px #00f5ff88, 0 0 20px #00f5ff44;
+    --glow-p: 0 0 8px #ff2d7888, 0 0 20px #ff2d7844;
+    --glow-g: 0 0 8px #00ff8888, 0 0 20px #00ff8844;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Rajdhani', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* scanline overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,245,255,.015) 2px, rgba(0,245,255,.015) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, #000010 0%, #0a0020 50%, #000010 100%);
+    border-bottom: 1px solid var(--neon-cyan);
+    box-shadow: var(--glow-c);
+    padding: 1.5rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  header::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--neon-cyan), var(--neon-purple), var(--neon-cyan), transparent);
+    animation: scanH 3s linear infinite;
+  }
+  @keyframes scanH { 0%{opacity:.4} 50%{opacity:1} 100%{opacity:.4} }
+
+  .logo-box {
+    border: 1px solid var(--neon-cyan);
+    padding: .5rem .9rem;
+    box-shadow: var(--glow-c);
+  }
+  .logo-box span {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--neon-cyan);
+    letter-spacing: .1em;
+    text-shadow: var(--glow-c);
+  }
+  header h1 {
+    font-family: 'Orbitron', monospace;
+    font-size: 1rem;
+    font-weight: 400;
+    color: var(--text-dim);
+    letter-spacing: .2em;
+    text-transform: uppercase;
+  }
+  header h1 strong {
+    display: block;
+    color: var(--neon-cyan);
+    font-size: 1.2rem;
+    font-weight: 700;
+    text-shadow: var(--glow-c);
+  }
+  .header-stats {
+    margin-left: auto;
+    display: flex;
+    gap: 1.5rem;
+  }
+  .stat {
+    text-align: center;
+    font-family: 'Share Tech Mono', monospace;
+  }
+  .stat-val {
+    font-size: 1.8rem;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 10px #ffe00088;
+    display: block;
+  }
+  .stat-label { font-size: .65rem; color: var(--text-dim); letter-spacing: .1em; }
+
+  /* ── NAV ── */
+  nav {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0;
+    overflow-x: auto;
+  }
+  .nav-btn {
+    font-family: 'Orbitron', monospace;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    padding: 1rem 1.5rem;
+    background: none;
+    border: none;
+    border-right: 1px solid var(--border);
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all .2s;
+    white-space: nowrap;
+    position: relative;
+  }
+  .nav-btn::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+    background: var(--neon-cyan);
+    transform: scaleX(0);
+    transition: transform .2s;
+  }
+  .nav-btn:hover { color: var(--neon-cyan); background: rgba(0,245,255,.05); }
+  .nav-btn:hover::after { transform: scaleX(1); }
+  .nav-btn.active { color: var(--neon-cyan); background: rgba(0,245,255,.08); }
+  .nav-btn.active::after { transform: scaleX(1); }
+
+  /* ── MAIN ── */
+  main { padding: 2rem; max-width: 1400px; margin: 0 auto; }
+
+  /* ── SECTIONS ── */
+  .section { display: none; animation: fadeIn .3s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+
+  /* ── CARDS ── */
+  .card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .card-title {
+    font-family: 'Orbitron', monospace;
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .2em;
+    color: var(--neon-cyan);
+    text-shadow: var(--glow-c);
+    margin-bottom: 1.2rem;
+    padding-bottom: .5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── FORM ── */
+  .form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .field { display: flex; flex-direction: column; gap: .4rem; }
+  label {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .65rem;
+    color: var(--neon-cyan);
+    letter-spacing: .15em;
+  }
+  input, select {
+    background: #050510;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--text);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .9rem;
+    padding: .5rem .75rem;
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    width: 100%;
+  }
+  input:focus, select:focus {
+    border-color: var(--neon-cyan);
+    box-shadow: 0 0 0 2px rgba(0,245,255,.15);
+  }
+  select option { background: #080815; }
+
+  /* pasos del wizard */
+  .wizard-steps {
+    display: flex;
+    gap: .5rem;
+    margin-bottom: 1.5rem;
+    overflow-x: auto;
+    padding-bottom: .5rem;
+  }
+  .step-chip {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .65rem;
+    padding: .3rem .7rem;
+    border-radius: 2px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    white-space: nowrap;
+    transition: all .2s;
+  }
+  .step-chip.done  { border-color: var(--neon-green); color: var(--neon-green); }
+  .step-chip.active { border-color: var(--neon-cyan); color: var(--neon-cyan); background: rgba(0,245,255,.1); }
+
+  /* materia card dentro del wizard */
+  .materia-block {
+    background: #050512;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.2rem;
+    margin-bottom: 1rem;
+  }
+  .materia-name {
+    font-family: 'Orbitron', monospace;
+    font-size: .7rem;
+    color: var(--neon-purple);
+    text-shadow: 0 0 8px #bf00ff66;
+    margin-bottom: 1rem;
+    letter-spacing: .1em;
+  }
+  .parciales-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+    gap: .75rem;
+  }
+
+  /* ── BOTONES ── */
+  .btn {
+    font-family: 'Orbitron', monospace;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    padding: .75rem 1.5rem;
+    border-radius: 2px;
+    border: none;
+    cursor: pointer;
+    transition: all .2s;
+    text-transform: uppercase;
+  }
+  .btn-cyan {
+    background: transparent;
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    box-shadow: var(--glow-c);
+  }
+  .btn-cyan:hover { background: rgba(0,245,255,.12); box-shadow: 0 0 20px #00f5ffaa; }
+  .btn-pink {
+    background: transparent;
+    border: 1px solid var(--neon-pink);
+    color: var(--neon-pink);
+  }
+  .btn-pink:hover { background: rgba(255,45,120,.1); }
+  .btn-green {
+    background: transparent;
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+  }
+  .btn-green:hover { background: rgba(0,255,136,.1); }
+  .btn-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; }
+
+  /* ── TABLA LISTA ── */
+  .table-wrap { overflow-x: auto; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .8rem;
+  }
+  th {
+    background: #080820;
+    color: var(--neon-cyan);
+    font-family: 'Orbitron', monospace;
+    font-size: .6rem;
+    letter-spacing: .15em;
+    padding: .75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--neon-cyan);
+  }
+  td {
+    padding: .65rem 1rem;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+  tr:hover td { background: rgba(0,245,255,.04); }
+  .badge {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .7rem;
+    padding: .2rem .6rem;
+    border-radius: 2px;
+    border: 1px solid;
+  }
+  .badge-green { color: var(--neon-green); border-color: var(--neon-green); }
+  .badge-red   { color: var(--neon-pink);  border-color: var(--neon-pink); }
+  .badge-yellow{ color: var(--neon-yellow);border-color: var(--neon-yellow); }
+
+  /* ── BUSQUEDA ── */
+  .search-bar {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-end;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .search-bar .field { flex: 1; min-width: 180px; }
+
+  /* ── BOLETA COMPLETA ── */
+  .boleta-header {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .info-row { display: flex; justify-content: space-between; padding: .35rem 0; border-bottom: 1px solid var(--border); }
+  .info-label { font-size: .7rem; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; letter-spacing: .1em; }
+  .info-val   { font-size: .85rem; color: var(--neon-yellow); font-family: 'Share Tech Mono', monospace; }
+
+  .prom-val { font-size: 2.5rem; font-family: 'Orbitron', monospace; font-weight: 900; }
+  .prom-green { color: var(--neon-green); text-shadow: var(--glow-g); }
+  .prom-red   { color: var(--neon-pink);  text-shadow: var(--glow-p); }
+  .prom-yellow{ color: var(--neon-yellow);text-shadow: 0 0 12px #ffe00088; }
+
+  .situacion-box {
+    border: 1px solid;
+    padding: 1rem 1.5rem;
+    border-radius: 4px;
+    font-family: 'Orbitron', monospace;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .15em;
+    text-align: center;
+    margin-top: 1rem;
+  }
+  .sit-aprobado   { border-color: var(--neon-green); color: var(--neon-green); box-shadow: var(--glow-g); }
+  .sit-reprobado  { border-color: var(--neon-pink);  color: var(--neon-pink);  box-shadow: var(--glow-p); }
+  .sit-titulacion { border-color: var(--neon-yellow);color: var(--neon-yellow);}
+
+  /* materias table en boleta */
+  .mat-table th { font-size: .55rem; padding: .5rem .6rem; }
+  .mat-table td { font-size: .75rem; padding: .5rem .6rem; }
+  .td-green { color: var(--neon-green); }
+  .td-red   { color: var(--neon-pink); }
+
+  /* ── VER TODOS ── */
+  .alumno-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.2rem 1.5rem;
+    margin-bottom: 1rem;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 1rem;
+    align-items: center;
+    transition: border-color .2s;
+  }
+  .alumno-card:hover { border-color: var(--neon-cyan); }
+  .ac-name {
+    font-family: 'Orbitron', monospace;
+    font-size: .85rem;
+    color: var(--neon-cyan);
+    text-shadow: var(--glow-c);
+  }
+  .ac-sub { font-size: .7rem; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; margin-top: .2rem; }
+  .ac-label { font-size: .6rem; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; letter-spacing: .1em; margin-bottom: .2rem; }
+  .ac-val { font-family: 'Orbitron', monospace; font-size: 1.1rem; font-weight: 700; }
+
+  /* ── EMPTY STATE ── */
+  .empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-dim);
+  }
+  .empty-icon { font-size: 3rem; margin-bottom: 1rem; opacity: .4; }
+  .empty p { font-family: 'Share Tech Mono', monospace; font-size: .85rem; letter-spacing: .1em; }
+
+  /* ── TOAST ── */
+  #toast {
+    position: fixed; bottom: 2rem; right: 2rem;
+    background: var(--bg3);
+    border: 1px solid var(--neon-green);
+    color: var(--neon-green);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: .8rem;
+    padding: .75rem 1.25rem;
+    border-radius: 2px;
+    box-shadow: var(--glow-g);
+    transform: translateY(100px);
+    opacity: 0;
+    transition: all .3s;
+    z-index: 1000;
+    letter-spacing: .1em;
+  }
+  #toast.show { transform: translateY(0); opacity: 1; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .boleta-header { grid-template-columns: 1fr; }
+    .alumno-card { grid-template-columns: 1fr 1fr; }
+    .parciales-row { grid-template-columns: 1fr 1fr 1fr; }
+    header { flex-wrap: wrap; }
+    .header-stats { margin-left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-box"><span>CBTIS</span></div>
+  <div>
+    <h1>PLANTEL 166 — DGETI<strong>SISTEMA DE BOLETAS</strong></h1>
+  </div>
+  <div class="header-stats">
+    <div class="stat">
+      <span class="stat-val" id="hdr-total">0</span>
+      <span class="stat-label">ALUMNOS</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val" id="hdr-aprobados">0</span>
+      <span class="stat-label">APROBADOS</span>
+    </div>
+    <div class="stat">
+      <span class="stat-val" id="hdr-reprobados">0</span>
+      <span class="stat-label">REPROBADOS</span>
+    </div>
+  </div>
+</header>
+
+<nav>
+  <button class="nav-btn active" onclick="goTo('sec-registro',this)">[ 01 ] REGISTRAR</button>
+  <button class="nav-btn" onclick="goTo('sec-lista',this)">[ 02 ] LISTA</button>
+  <button class="nav-btn" onclick="goTo('sec-buscar',this)">[ 03 ] BUSCAR</button>
+  <button class="nav-btn" onclick="goTo('sec-boleta',this)">[ 04 ] VER BOLETA</button>
+  <button class="nav-btn" onclick="goTo('sec-todos',this)">[ 05 ] VER TODOS</button>
+</nav>
+
+<main>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECCIÓN 1: REGISTRAR
+════════════════════════════════════════════════════════════════ -->
+<div id="sec-registro" class="section active">
+  <div class="card">
+    <div class="card-title">// REGISTRO DE ALUMNO</div>
+
+    <!-- pasos -->
+    <div class="wizard-steps" id="wizard-steps"></div>
+
+    <!-- paso 0: datos personales -->
+    <div id="paso-0">
+      <div class="form-grid">
+        <div class="field"><label>NOMBRE</label><input id="r-nom" type="text" placeholder="Ingresa el nombre del alumno"></div>
+        <div class="field"><label>NO. CONTROL</label><input id="r-numc" type="number" placeholder="12345"></div>
+        <div class="field"><label>GRADO</label>
+          <select id="r-grad"><option value="">--</option><option>1</option><option>2</option><option>3</option></select>
+        </div>
+        <div class="field"><label>GRUPO</label><input id="r-grup" type="text" placeholder="A"></div>
+        <div class="field"><label>TURNO</label>
+          <select id="r-turn"><option value="">--</option><option>MATUTINO</option><option>VESPERTINO</option></select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-cyan" onclick="pasoSiguiente()">SIGUIENTE →</button>
+        <button class="btn btn-pink" onclick="cancelarRegistro()">CANCELAR</button>
+      </div>
+    </div>
+
+    <!-- pasos 1-9: materias (se generan dinámicamente) -->
+    <div id="paso-materias"></div>
+
+    <!-- paso final: confirmación -->
+    <div id="paso-final" style="display:none">
+      <div class="situacion-box sit-aprobado" style="margin-bottom:1rem">
+        ✓ TODOS LOS DATOS CAPTURADOS CORRECTAMENTE
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-green" onclick="guardarAlumno()">✓ GUARDAR ALUMNO</button>
+        <button class="btn btn-pink" onclick="cancelarRegistro()">✕ CANCELAR</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECCIÓN 2: LISTA
+════════════════════════════════════════════════════════════════ -->
+<div id="sec-lista" class="section">
+  <div class="card">
+    <div class="card-title">// LISTA DE ALUMNOS REGISTRADOS</div>
+    <div id="tabla-lista"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECCIÓN 3: BUSCAR
+════════════════════════════════════════════════════════════════ -->
+<div id="sec-buscar" class="section">
+  <div class="card">
+    <div class="card-title">// BUSCAR ALUMNO POR NO. CONTROL</div>
+    <div class="search-bar">
+      <div class="field"><label>NO. DE CONTROL</label><input id="buscar-ctrl" type="number" placeholder="12345" onkeyup="if(event.key==='Enter')buscarAlumno()"></div>
+      <button class="btn btn-cyan" onclick="buscarAlumno()">BUSCAR</button>
+    </div>
+    <div id="resultado-buscar"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECCIÓN 4: VER BOLETA
+════════════════════════════════════════════════════════════════ -->
+<div id="sec-boleta" class="section">
+  <div class="card">
+    <div class="card-title">// VER BOLETA COMPLETA</div>
+    <div class="search-bar">
+      <div class="field"><label>NO. DE CONTROL</label><input id="boleta-ctrl" type="number" placeholder="12345" onkeyup="if(event.key==='Enter')verBoleta()"></div>
+      <button class="btn btn-cyan" onclick="verBoleta()">CARGAR BOLETA</button>
+    </div>
+    <div id="resultado-boleta"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SECCIÓN 5: VER TODOS
+════════════════════════════════════════════════════════════════ -->
+<div id="sec-todos" class="section">
+  <div class="card">
+    <div class="card-title">// RESUMEN DE TODOS LOS ALUMNOS</div>
+    <div id="todos-lista"></div>
+  </div>
+</div>
+
+</main>
+
+<div id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// DATOS
+// ═══════════════════════════════════════════════════════════════
+const MATERIAS = [
+  "INGLES II",
+  "Cultura Digital II",
+  "Ciencias Sociales II",
+  "Ciencias Naturales II",
+  "Lengua y Comunicacion II",
+  "Codifica software de sistemas informaticos",
+  "Disenha software de sistemas informaticos",
+  "Implementa software de sistemas informaticos",
+  "Pensamiento Matematico II"
+];
+const ESPECIALIDAD = [5, 6, 7]; // indices en MATERIAS
+const SEMANAS = 6;
+
+// ── localStorage ─────────────────────────────────────────────
+function cargar() {
+  try { return JSON.parse(localStorage.getItem('cbtis166_bd')) || []; }
+  catch(e) { return []; }
+}
+function guardar(bd) {
+  localStorage.setItem('cbtis166_bd', JSON.stringify(bd));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// NAVEGACIÓN
+// ═══════════════════════════════════════════════════════════════
+function goTo(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+
+  if (id === 'sec-lista')   renderLista();
+  if (id === 'sec-todos')   renderTodos();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// STATS HEADER
+// ═══════════════════════════════════════════════════════════════
+function actualizarStats() {
+  const bd = cargar();
+  let aprobados = 0, reprobados = 0;
+  bd.forEach(a => {
+    const r = calcularResultados(a);
+    if (r.situacion === 'APROBADO') aprobados++;
+    else reprobados++;
+  });
+  document.getElementById('hdr-total').textContent      = bd.length;
+  document.getElementById('hdr-aprobados').textContent  = aprobados;
+  document.getElementById('hdr-reprobados').textContent = reprobados;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CÁLCULOS
+// ═══════════════════════════════════════════════════════════════
+function calcularResultados(a) {
+  let promGen = 0, asistTotal = 0, totHrsGral = 0, repFaltas = false;
+
+  for (let i = 0; i < MATERIAS.length; i++) {
+    const prom  = (a.parciales[i][0] + a.parciales[i][1] + a.parciales[i][2]) / 3;
+    const tot   = a.horas[i] * SEMANAS;
+    const asist = tot - a.faltas[i];
+    const pct   = tot > 0 ? (asist / tot * 100) : 0;
+    if (pct < 80) repFaltas = true;
+    promGen    += prom;
+    asistTotal += asist;
+    totHrsGral += tot;
+  }
+  promGen /= MATERIAS.length;
+  const pctGral = totHrsGral > 0 ? (asistTotal / totHrsGral * 100) : 0;
+
+  let promEsp = 0, asistEsp = 0, totHrsEsp = 0, repEsp = false;
+  for (let k = 0; k < ESPECIALIDAD.length; k++) {
+    const i     = ESPECIALIDAD[k];
+    const prom  = (a.parciales[i][0] + a.parciales[i][1] + a.parciales[i][2]) / 3;
+    const tot   = a.horas[i] * SEMANAS;
+    const asist = tot - a.faltas[i];
+    const pct   = tot > 0 ? (asist / tot * 100) : 0;
+    if (pct < 80) repEsp = true;
+    promEsp  += prom;
+    asistEsp += asist;
+    totHrsEsp+= tot;
+  }
+  promEsp /= ESPECIALIDAD.length;
+  const pctEsp = totHrsEsp > 0 ? (asistEsp / totHrsEsp * 100) : 0;
+
+  let situacion;
+  if (promGen < 6)    situacion = 'REPROBADO';
+  else if (repFaltas) situacion = 'REPROBADO POR FALTAS';
+  else                situacion = 'APROBADO';
+
+  let sitEsp;
+  if (promEsp < 6)   sitEsp = 'REPROBADO';
+  else if (repEsp)   sitEsp = 'REPROBADO POR FALTAS';
+  else               sitEsp = 'APROBADO';
+
+  const titulacion = promEsp >= 8 ? 'POSIBLE' : 'NO POSIBLE';
+
+  return { promGen, promEsp, pctGral, pctEsp, situacion, sitEsp, titulacion,
+           asistTotal, totHrsGral, asistEsp, totHrsEsp, repFaltas, repEsp };
+}
+
+function colorProm(v) { return v >= 6 ? 'td-green' : 'td-red'; }
+function colorPct(v)  { return v >= 80 ? 'td-green' : 'td-red'; }
+
+// ═══════════════════════════════════════════════════════════════
+// WIZARD DE REGISTRO
+// ═══════════════════════════════════════════════════════════════
+let wizardPaso = 0;
+let wizardData = {};
+
+function initWizard() {
+  wizardPaso = 0;
+  wizardData = { horas: Array(9).fill(0), parciales: Array.from({length:9},()=>[0,0,0]), faltas: Array(9).fill(0) };
+  renderWizardSteps();
+  mostrarPaso(0);
+}
+
+function renderWizardSteps() {
+  const cont = document.getElementById('wizard-steps');
+  cont.innerHTML = '';
+  const pasos = ['DATOS', ...MATERIAS.map((_,i)=>`MAT.${i+1}`), 'LISTO'];
+  pasos.forEach((p, i) => {
+    const chip = document.createElement('div');
+    chip.className = 'step-chip' + (i < wizardPaso ? ' done' : i === wizardPaso ? ' active' : '');
+    chip.textContent = p;
+    cont.appendChild(chip);
+  });
+}
+
+function mostrarPaso(paso) {
+  document.getElementById('paso-0').style.display = paso === 0 ? '' : 'none';
+  document.getElementById('paso-materias').innerHTML = '';
+  document.getElementById('paso-final').style.display = 'none';
+
+  if (paso >= 1 && paso <= MATERIAS.length) {
+    const i = paso - 1;
+    const tot = wizardData.horas[i] * SEMANAS || '?';
+    document.getElementById('paso-materias').innerHTML = `
+      <div class="materia-block">
+        <div class="materia-name">[ ${i+1}/${MATERIAS.length} ] ${MATERIAS[i]}</div>
+        <div class="parciales-row">
+          <div class="field"><label>HRS/SEM</label>
+            <input type="number" id="m-hrs" min="1" max="20" placeholder="3"
+              value="${wizardData.horas[i]||''}" oninput="wizardData.horas[${i}]=+this.value">
+          </div>
+          <div class="field"><label>PARCIAL 1</label>
+            <input type="number" id="m-p1" min="5" max="10" placeholder="5-10"
+              value="${wizardData.parciales[i][0]||''}" oninput="wizardData.parciales[${i}][0]=+this.value">
+          </div>
+          <div class="field"><label>PARCIAL 2</label>
+            <input type="number" id="m-p2" min="5" max="10" placeholder="5-10"
+              value="${wizardData.parciales[i][1]||''}" oninput="wizardData.parciales[${i}][1]=+this.value">
+          </div>
+          <div class="field"><label>PARCIAL 3</label>
+            <input type="number" id="m-p3" min="5" max="10" placeholder="5-10"
+              value="${wizardData.parciales[i][2]||''}" oninput="wizardData.parciales[${i}][2]=+this.value">
+          </div>
+          <div class="field"><label>FALTAS (hrs)</label>
+            <input type="number" id="m-flt" min="0" placeholder="0"
+              value="${wizardData.faltas[i]||''}" oninput="wizardData.faltas[${i}]=+this.value">
+          </div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-pink" onclick="pasoAnterior()">← ANTERIOR</button>
+        <button class="btn btn-cyan" onclick="pasoSiguiente()">SIGUIENTE →</button>
+      </div>`;
+  }
+
+  if (paso === MATERIAS.length + 1) {
+    document.getElementById('paso-final').style.display = '';
+  }
+}
+
+function pasoSiguiente() {
+  if (wizardPaso === 0) {
+    const nom  = document.getElementById('r-nom').value.trim();
+    const numc = +document.getElementById('r-numc').value;
+    const grad = +document.getElementById('r-grad').value;
+    const grup = document.getElementById('r-grup').value.trim();
+    const turn = document.getElementById('r-turn').value;
+    if (!nom || !numc || !grad || !grup || !turn) { toast('Completa todos los datos personales', true); return; }
+    wizardData.nom = nom; wizardData.numc = numc;
+    wizardData.grad = grad; wizardData.grup = grup; wizardData.turn = turn;
+
+    // verificar control duplicado
+    const bd = cargar();
+    if (bd.find(a => a.numc === numc)) { toast('Ese número de control ya existe', true); return; }
+  }
+
+  if (wizardPaso >= 1 && wizardPaso <= MATERIAS.length) {
+    const i = wizardPaso - 1;
+    const hrs = wizardData.horas[i];
+    const p1  = wizardData.parciales[i][0];
+    const p2  = wizardData.parciales[i][1];
+    const p3  = wizardData.parciales[i][2];
+    const flt = wizardData.faltas[i];
+    if (!hrs || hrs < 1)                      { toast('Ingresa las horas (min 1)', true); return; }
+    if (!p1||p1<5||p1>10)                     { toast('Parcial 1 debe ser 5-10', true); return; }
+    if (!p2||p2<5||p2>10)                     { toast('Parcial 2 debe ser 5-10', true); return; }
+    if (!p3||p3<5||p3>10)                     { toast('Parcial 3 debe ser 5-10', true); return; }
+    if (flt < 0 || flt > hrs * SEMANAS)       { toast('Faltas fuera de rango', true); return; }
+  }
+
+  wizardPaso++;
+  renderWizardSteps();
+  mostrarPaso(wizardPaso);
+}
+
+function pasoAnterior() {
+  if (wizardPaso > 0) { wizardPaso--; renderWizardSteps(); mostrarPaso(wizardPaso); }
+}
+
+function guardarAlumno() {
+  const bd = cargar();
+  bd.push({
+    nom:      wizardData.nom,
+    numc:     wizardData.numc,
+    grad:     wizardData.grad,
+    grup:     wizardData.grup,
+    turn:     wizardData.turn,
+    horas:    wizardData.horas,
+    parciales:wizardData.parciales,
+    faltas:   wizardData.faltas
+  });
+  guardar(bd);
+  actualizarStats();
+  toast(`Alumno ${wizardData.nom} guardado correctamente`);
+  cancelarRegistro();
+}
+
+function cancelarRegistro() {
+  document.getElementById('r-nom').value  = '';
+  document.getElementById('r-numc').value = '';
+  document.getElementById('r-grad').value = '';
+  document.getElementById('r-grup').value = '';
+  document.getElementById('r-turn').value = '';
+  initWizard();
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LISTA
+// ═══════════════════════════════════════════════════════════════
+function renderLista() {
+  const bd = cargar();
+  const cont = document.getElementById('tabla-lista');
+  if (bd.length === 0) { cont.innerHTML = emptyState(); return; }
+
+  let html = `<div class="table-wrap"><table>
+    <tr><th>NO.</th><th>NOMBRE</th><th>NO. CTRL</th><th>GRADO</th><th>GRUPO</th><th>TURNO</th><th>PROM. GRAL</th><th>SITUACION</th><th>ACCIÓN</th></tr>`;
+  bd.forEach((a, idx) => {
+    const r = calcularResultados(a);
+    const badgeCls = r.situacion === 'APROBADO' ? 'badge-green' : 'badge-red';
+    html += `<tr>
+      <td>${idx+1}</td>
+      <td>${a.nom}</td>
+      <td>${a.numc}</td>
+      <td>${a.grad}</td>
+      <td>${a.grup}</td>
+      <td>${a.turn}</td>
+      <td class="${colorProm(r.promGen)}">${r.promGen.toFixed(1)}</td>
+      <td><span class="badge ${badgeCls}">${r.situacion}</span></td>
+      <td>
+        <button class="btn btn-cyan" style="padding:.3rem .7rem;font-size:.6rem"
+          onclick="verBoletaDirecto(${a.numc})">BOLETA</button>
+        <button class="btn btn-pink" style="padding:.3rem .7rem;font-size:.6rem;margin-left:.3rem"
+          onclick="eliminarAlumno(${a.numc})">✕</button>
+      </td>
+    </tr>`;
+  });
+  html += '</table></div>';
+  cont.innerHTML = html;
+}
+
+function eliminarAlumno(numc) {
+  if (!confirm('¿Eliminar a este alumno?')) return;
+  let bd = cargar();
+  bd = bd.filter(a => a.numc !== numc);
+  guardar(bd);
+  actualizarStats();
+  renderLista();
+  toast('Alumno eliminado');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BUSCAR
+// ═══════════════════════════════════════════════════════════════
+function buscarAlumno() {
+  const numc = +document.getElementById('buscar-ctrl').value;
+  const bd   = cargar();
+  const a    = bd.find(x => x.numc === numc);
+  const cont = document.getElementById('resultado-buscar');
+
+  if (!a) { cont.innerHTML = `<div class="situacion-box sit-reprobado">✕ NO SE ENCONTRÓ NINGÚN ALUMNO CON ESE NÚMERO DE CONTROL</div>`; return; }
+
+  const r = calcularResultados(a);
+  cont.innerHTML = `
+    <div class="card" style="margin-bottom:0">
+      <div class="form-grid">
+        <div><div class="info-row"><span class="info-label">NOMBRE</span><span class="info-val">${a.nom}</span></div></div>
+        <div><div class="info-row"><span class="info-label">NO. CONTROL</span><span class="info-val">${a.numc}</span></div></div>
+        <div><div class="info-row"><span class="info-label">GRADO</span><span class="info-val">${a.grad}</span></div></div>
+        <div><div class="info-row"><span class="info-label">GRUPO</span><span class="info-val">${a.grup}</span></div></div>
+        <div><div class="info-row"><span class="info-label">TURNO</span><span class="info-val">${a.turn}</span></div></div>
+        <div><div class="info-row"><span class="info-label">PROM. GENERAL</span><span class="info-val ${colorProm(r.promGen)}">${r.promGen.toFixed(1)}</span></div></div>
+        <div><div class="info-row"><span class="info-label">PROM. ESPECIALIDAD</span><span class="info-val ${colorProm(r.promEsp)}">${r.promEsp.toFixed(1)}</span></div></div>
+        <div><div class="info-row"><span class="info-label">SITUACION</span><span class="info-val ${r.situacion==='APROBADO'?'td-green':'td-red'}">${r.situacion}</span></div></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-cyan" onclick="verBoletaDirecto(${a.numc})">VER BOLETA COMPLETA</button>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VER BOLETA
+// ═══════════════════════════════════════════════════════════════
+function verBoleta() {
+  const numc = +document.getElementById('boleta-ctrl').value;
+  const bd   = cargar();
+  const a    = bd.find(x => x.numc === numc);
+  const cont = document.getElementById('resultado-boleta');
+  if (!a) { cont.innerHTML = `<div class="situacion-box sit-reprobado">✕ ALUMNO NO ENCONTRADO</div>`; return; }
+  cont.innerHTML = generarBoleta(a);
+}
+
+function verBoletaDirecto(numc) {
+  // navega a la sección de boleta y carga directo
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('sec-boleta').classList.add('active');
+  document.querySelectorAll('.nav-btn')[3].classList.add('active');
+  document.getElementById('boleta-ctrl').value = numc;
+  const bd = cargar();
+  const a  = bd.find(x => x.numc === numc);
+  document.getElementById('resultado-boleta').innerHTML = a ? generarBoleta(a) : '';
+}
+
+function generarBoleta(a) {
+  const r = calcularResultados(a);
+
+  // tabla de materias
+  let filas = '';
+  for (let i = 0; i < MATERIAS.length; i++) {
+    const prom  = (a.parciales[i][0] + a.parciales[i][1] + a.parciales[i][2]) / 3;
+    const tot   = a.horas[i] * SEMANAS;
+    const asist = tot - a.faltas[i];
+    const pct   = tot > 0 ? (asist / tot * 100) : 0;
+    const esEsp = ESPECIALIDAD.includes(i);
+    filas += `<tr ${esEsp ? 'style="background:rgba(191,0,255,.07)"' : ''}>
+      <td>${esEsp ? '★ ' : ''}${MATERIAS[i]}</td>
+      <td>${a.horas[i]}</td>
+      <td>${a.parciales[i][0]}</td>
+      <td>${a.parciales[i][1]}</td>
+      <td>${a.parciales[i][2]}</td>
+      <td class="${colorProm(prom)}">${prom.toFixed(1)}</td>
+      <td>${a.faltas[i]}</td>
+      <td class="${colorPct(pct)}">${asist}/${tot}</td>
+      <td class="${colorPct(pct)}">${pct.toFixed(0)}%</td>
+    </tr>`;
+  }
+
+  const sitClass = r.situacion === 'APROBADO' ? 'sit-aprobado' : 'sit-reprobado';
+  const espClass = r.sitEsp    === 'APROBADO' ? 'sit-aprobado' : 'sit-reprobado';
+  const titClass = r.titulacion === 'POSIBLE'  ? 'sit-aprobado' : 'sit-titulacion';
+  const titMsg   = r.titulacion === 'POSIBLE'
+    ? '🎓 TU TITULACIÓN AÚN ES POSIBLE :D'
+    : '✕ TU TITULACIÓN YA NO ES POSIBLE :(';
+
+  return `
+    <div class="boleta-header">
+      <div class="card" style="margin:0">
+        <div class="card-title">// DATOS DEL ALUMNO</div>
+        <div class="info-row"><span class="info-label">NOMBRE</span><span class="info-val">${a.nom}</span></div>
+        <div class="info-row"><span class="info-label">NO. CONTROL</span><span class="info-val">${a.numc}</span></div>
+        <div class="info-row"><span class="info-label">GRADO</span><span class="info-val">${a.grad}</span></div>
+        <div class="info-row"><span class="info-label">GRUPO</span><span class="info-val">${a.grup}</span></div>
+        <div class="info-row"><span class="info-label">TURNO</span><span class="info-val">${a.turn}</span></div>
+        <div class="info-row"><span class="info-label">SEMANAS</span><span class="info-val">${SEMANAS}</span></div>
+        <div class="info-row"><span class="info-label">ASIST. MÍNIMA</span><span class="info-val">80%</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1rem">
+        <div class="card" style="margin:0;text-align:center">
+          <div class="card-title">// PROM. GENERAL</div>
+          <div class="prom-val ${r.promGen>=6?'prom-green':'prom-red'}">${r.promGen.toFixed(1)}</div>
+        </div>
+        <div class="card" style="margin:0;text-align:center">
+          <div class="card-title">// PROM. ESPECIALIDAD</div>
+          <div class="prom-val ${r.promEsp>=8?'prom-green':r.promEsp>=6?'prom-yellow':'prom-red'}">${r.promEsp.toFixed(1)}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">// CALIFICACIONES POR MATERIA  <span style="color:var(--neon-purple);font-size:.65rem">★ = MÓDULO I</span></div>
+      <div class="table-wrap">
+        <table class="mat-table">
+          <tr>
+            <th>ASIGNATURA</th><th>HRS/SEM</th>
+            <th>P1</th><th>P2</th><th>P3</th><th>PROM</th>
+            <th>FALTAS</th><th>ASIST</th><th>%ASIST</th>
+          </tr>
+          ${filas}
+        </table>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem">
+      <div class="situacion-box ${sitClass}">${r.situacion}</div>
+      <div class="situacion-box ${espClass}">MÓDULO I: ${r.sitEsp}</div>
+      <div class="situacion-box ${titClass}">${titMsg}</div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// VER TODOS
+// ═══════════════════════════════════════════════════════════════
+function renderTodos() {
+  const bd   = cargar();
+  const cont = document.getElementById('todos-lista');
+  if (bd.length === 0) { cont.innerHTML = emptyState(); return; }
+
+  let html = '';
+  bd.forEach((a, idx) => {
+    const r = calcularResultados(a);
+    const cGen = r.situacion === 'APROBADO' ? 'td-green' : 'td-red';
+    const cEsp = r.sitEsp    === 'APROBADO' ? 'td-green' : 'td-red';
+    const cTit = r.titulacion === 'POSIBLE' ? 'td-green' : 'td-red';
+
+    html += `<div class="alumno-card">
+      <div>
+        <div class="ac-name">${a.nom}</div>
+        <div class="ac-sub">NO.CTRL: ${a.numc} &nbsp;|&nbsp; ${a.grad}° ${a.grup} &nbsp;|&nbsp; ${a.turn}</div>
+      </div>
+      <div>
+        <div class="ac-label">PROM. GENERAL</div>
+        <div class="ac-val ${cGen}">${r.promGen.toFixed(1)}</div>
+      </div>
+      <div>
+        <div class="ac-label">PROM. MÓDULO I</div>
+        <div class="ac-val ${cEsp}">${r.promEsp.toFixed(1)}</div>
+      </div>
+      <div>
+        <div class="ac-label">SITUACION</div>
+        <span class="badge ${r.situacion==='APROBADO'?'badge-green':'badge-red'}" style="font-size:.6rem">${r.situacion}</span>
+      </div>
+      <div>
+        <div class="ac-label">TITULACION</div>
+        <span class="badge ${r.titulacion==='POSIBLE'?'badge-green':'badge-red'}" style="font-size:.6rem">${r.titulacion}</span>
+        <br>
+        <button class="btn btn-cyan" style="margin-top:.4rem;padding:.25rem .6rem;font-size:.55rem"
+          onclick="verBoletaDirecto(${a.numc})">BOLETA</button>
+      </div>
+    </div>`;
+  });
+
+  cont.innerHTML = html;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// UTILIDADES UI
+// ═══════════════════════════════════════════════════════════════
+function emptyState() {
+  return `<div class="empty">
+    <div class="empty-icon">◈</div>
+    <p>NO HAY ALUMNOS REGISTRADOS</p>
+  </div>`;
+}
+
+function toast(msg, error = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.borderColor  = error ? 'var(--neon-pink)'  : 'var(--neon-green)';
+  t.style.color        = error ? 'var(--neon-pink)'  : 'var(--neon-green)';
+  t.style.boxShadow    = error ? 'var(--glow-p)' : 'var(--glow-g)';
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════
+initWizard();
+actualizarStats();
+</script>
+</body>
+</html>
